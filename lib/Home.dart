@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'The Right',
       theme: ThemeData(
-        brightness: Brightness.dark, // Set the overall brightness to dark
+        brightness: Brightness.light, // Set the overall brightness to light
       ),
       home: HomePage(),
     );
@@ -28,12 +28,12 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          Colors.black, // Set the Scaffold background color to black
+          Colors.white, // Set the Scaffold background color to white
       appBar: AppBar(
-        backgroundColor: Colors.black, // Set the AppBar color to black
+        backgroundColor: Colors.white, // Set the AppBar color to white
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new,
-              color: Colors.white), // Set the back button color to white
+              color: Colors.black), // Set the back button color to black
           onPressed: () {
             // Handle back button press
           },
@@ -43,12 +43,12 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.home,
-                  color: Colors.white), // Set the home icon color to white
+                  color: Colors.black), // Set the home icon color to black
               SizedBox(width: 8),
               Text(
                 'The Right',
                 style: TextStyle(
-                    color: Colors.white), // Set the title text color to white
+                    color: Colors.black), // Set the title text color to black
               ),
             ],
           ),
@@ -57,7 +57,7 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.notifications,
                 color:
-                    Colors.white), // Set the notification icon color to white
+                    Colors.black), // Set the notification icon color to black
             onPressed: () {
               // Handle notification button press
             },
@@ -83,7 +83,7 @@ class HomePage extends StatelessWidget {
                     text: 'Grievances',
                     color: Colors.white, // Set the button color to white
                     iconColor: Colors.black, // Set the icon color to black
-                    size: 150, // Increase the button size
+                    size: 150,
                   ),
                 ),
                 SizedBox(width: 16),
@@ -99,7 +99,7 @@ class HomePage extends StatelessWidget {
                     text: 'Status',
                     color: Colors.white, // Set the button color to white
                     iconColor: Colors.black, // Set the icon color to black
-                    size: 150, // Increase the button size
+                    size: 150,
                   ),
                 ),
               ],
@@ -120,7 +120,7 @@ class HomePage extends StatelessWidget {
                     text: 'Profile',
                     color: Colors.white, // Set the button color to white
                     iconColor: Colors.black, // Set the icon color to black
-                    size: 150, // Increase the button size
+                    size: 150,
                   ),
                 ),
                 SizedBox(width: 16),
@@ -136,7 +136,7 @@ class HomePage extends StatelessWidget {
                     text: 'About Us',
                     color: Colors.white, // Set the button color to white
                     iconColor: Colors.black, // Set the icon color to black
-                    size: 150, // Increase the button size
+                    size: 150,
                   ),
                 ),
               ],
@@ -174,8 +174,8 @@ class MenuButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(
-                    0.5), // Set the shadow color to black with opacity
+                color: Colors.grey.withOpacity(
+                    0.5), // Set the shadow color to grey with opacity
                 spreadRadius: 1,
                 blurRadius: 5,
                 offset: Offset(0, 3),
@@ -192,7 +192,7 @@ class MenuButton extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-            color: Colors.white, // Set the text color to white
+            color: Colors.black, // Set the text color to black
             fontSize: 16, // Increase the text size slightly
           ),
         ),

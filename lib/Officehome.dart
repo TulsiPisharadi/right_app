@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:right_app/AboutUs.dart';
 import 'package:right_app/Profile.dart';
 import 'package:right_app/Replies.dart';
-import 'package:right_app/submissions.dart';
+import 'package:right_app/Submissions.dart';
 
 class OfficeHomePage extends StatefulWidget {
   @override
