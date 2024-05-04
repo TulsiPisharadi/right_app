@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,32 +15,78 @@ class StatusPage extends StatelessWidget {
             .collection('grievances')
             .where('userId', isEqualTo: getCurrentUserId())
             .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+        builder: (context, grievancesSnapshot) {
+          if (grievancesSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
-
-          if (!snapshot.hasData) {
-            return CircularProgressIndicator();
+          if (grievancesSnapshot.hasError) {
+            return Center(
+              child: Text(
+                'Error: ${grievancesSnapshot.error}',
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
           }
 
           return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
+            itemCount: grievancesSnapshot.data!.docs.length,
             itemBuilder: (context, index) {
-              final grievanceData =
-                  snapshot.data!.docs[index].data() as Map<String, dynamic>;
-              final grievanceId = snapshot.data!.docs[index].id;
-              final officerReply =
-                  grievanceData['officerReply'] ?? 'No reply yet';
-              final officerReplyTimestamp =
-                  grievanceData['officerReplyTimestamp']?.toDate() ??
-                      DateTime.now();
+              print('Index: $index');
+              print('Length: ${grievancesSnapshot.data!.docs.length}'
+                  ' ${grievancesSnapshot.data!.docs}');
+              // The snapshot contains a collection called replies which doc corresponding to each reply, each reply has a text and a timestamp
 
-              return StatusBox(
-                text: grievanceData['text'],
-                timestamp: grievanceData['timestamp'].toDate(),
-                officerReply: officerReply,
-                officerReplyTimestamp: officerReplyTimestamp,
+              final grievanceDoc = grievancesSnapshot.data!.docs[index];
+              final grievanceData = grievanceDoc.data() as Map<String, dynamic>;
+
+              final officerReplies = grievanceDoc.reference
+                  .collection('replies')
+                  .orderBy('timestamp', descending: true)
+                  .snapshots();
+
+              return StreamBuilder<QuerySnapshot>(
+                stream: officerReplies,
+                builder: (context, repliesSnapshot) {
+                  if (repliesSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (repliesSnapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Error: ${repliesSnapshot.error}',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  }
+
+                  final replies = repliesSnapshot.data!.docs;
+                  final grievanceText = grievanceData['text'];
+                  final grievanceTimestamp =
+                      grievanceData['timestamp'].toDate();
+
+                  final officerReplies = replies
+                      .map((reply) => reply.data() as Map<String, dynamic>)
+                      .toList();
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: officerReplies.length,
+                    itemBuilder: (context, index) {
+                      final replyData = officerReplies[index];
+                      final officerReply = replyData['text'];
+                      final officerReplyTimestamp =
+                          replyData['timestamp'].toDate();
+
+                      return StatusBox(
+                        text: grievanceText,
+                        timestamp: grievanceTimestamp,
+                        officerReply: officerReply,
+                        officerReplyTimestamp: officerReplyTimestamp,
+                      );
+                    },
+                  );
+                },
               );
             },
           );
@@ -52,14 +99,14 @@ class StatusPage extends StatelessWidget {
 class StatusBox extends StatelessWidget {
   final String text;
   final DateTime timestamp;
-  final String officerReply;
-  final DateTime officerReplyTimestamp;
+  String? officerReply;
+  DateTime? officerReplyTimestamp;
 
   StatusBox({
     required this.text,
     required this.timestamp,
-    required this.officerReply,
-    required this.officerReplyTimestamp,
+    this.officerReply,
+    this.officerReplyTimestamp,
   });
 
   @override
@@ -91,16 +138,34 @@ class StatusBox extends StatelessWidget {
             'Submitted on: ${timestamp.toString()}',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
-          SizedBox(height: 16),
-          Text(
-            'Officer Reply: $officerReply',
-            style: TextStyle(fontSize: 14),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Reply Timestamp: ${officerReplyTimestamp.toString()}',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
+          Builder(builder: (context) {
+            if (officerReply == null) {
+              return const SizedBox.shrink();
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                Text(
+                  'Officer\'s Reply:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  officerReply!,
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Replied on: ${officerReplyTimestamp.toString()}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            );
+          }),
         ],
       ),
     );

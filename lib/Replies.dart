@@ -64,6 +64,7 @@ class _GrievanceCardState extends State<GrievanceCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: MediaQuery.of(context).size.height * 0.8,
       padding: EdgeInsets.all(16),
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(

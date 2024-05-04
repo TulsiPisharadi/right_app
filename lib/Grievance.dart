@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import the cloud_firestore package
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:right_app/Status.dart'; // Import the cloud_firestore package
 
 void main() {
   runApp(MyApp());
@@ -103,6 +104,7 @@ class _GrievancePageState extends State<GrievancePage> {
         await FirebaseFirestore.instance.collection('grievances').add({
           'text': grievanceText,
           'timestamp': FieldValue.serverTimestamp(),
+          'userId': getCurrentUserId(),
         });
         // Clear the text field after successful submission
         _textController.clear();
