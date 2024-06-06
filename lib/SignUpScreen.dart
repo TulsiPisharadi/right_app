@@ -6,6 +6,7 @@ import 'package:right_app/Login.dart';
 import 'package:right_app/Officehome.dart';
 import 'package:right_app/Officesignup.dart';
 import 'package:right_app/SignUp.dart';
+import 'package:right_app/office_sign_up.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -73,7 +74,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => OfficeHomePage()),
+                              builder: (context) => OfficeSignUp()),
                         );
                       },
                       width: 120,
