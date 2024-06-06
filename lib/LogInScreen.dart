@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextFormField(
               style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                labelText: 'ID',
+                labelText: 'Email',
                 labelStyle: TextStyle(color: Colors.grey),
                 filled: true,
                 fillColor: Colors.white24,
@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               child: Text(
-                'SIGN IN',
+                'LOG IN',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

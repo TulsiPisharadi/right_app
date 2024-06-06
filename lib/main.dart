@@ -5,13 +5,18 @@ import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:right_app/SignUpScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:right_app/const.dart';
-import 'package:right_app/firebase_options.dart';
 import 'package:right_app/homepage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+    options: FirebaseOptions(
+      apiKey: 'AIzaSyDz9jb2tu18LkwOXdeJrnYVgviGpgCuDaE',
+      appId: '1:1013156451050:android:b31d08fb187eb6b47d7d93',
+      messagingSenderId: '1013156451050',
+      projectId: 'rightapp-c9459',
+      storageBucket: 'rightapp-c9459.appspot.com',
+    ),
   );
   Gemini.init(
     apiKey: GEMINI_API_KEY,
@@ -24,7 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: SignUpScreen(),
     );
   }
 }

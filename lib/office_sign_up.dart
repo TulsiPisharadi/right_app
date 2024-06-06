@@ -1,42 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:right_app/Profile.dart';
-import 'package:right_app/SignUp.dart';
+import 'package:right_app/Login.dart';
 import 'package:right_app/Home.dart';
+import 'package:right_app/Officehome.dart';
 
-class LogIn extends StatefulWidget {
+class OfficeSignUp extends StatefulWidget {
   @override
-  _LogInState createState() => _LogInState();
+  _OfficeSignUpState createState() => _OfficeSignUpState();
 }
 
-class _LogInState extends State<LogIn> {
+class _OfficeSignUpState extends State<OfficeSignUp> {
   final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
+  final _officeController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   void dispose() {
+    _fullNameController.dispose();
+    _phoneNumberController.dispose();
+    _officeController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _createAccount(
+    String fullName,
+    String phoneNumber,
+    String office,
     String email,
     String password,
   ) async {
-    print('Creating account with fullName: email: $email, password: $password');
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      print(
+          'Creating account...with email: $email and password: $password and fullName: $fullName and phoneNumber: $phoneNumber and office: $office');
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+      final user = credential.user;
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'fullName': fullName,
+        'phoneNumber': phoneNumber,
+        'office': office,
+        'email': email,
+        'role': 'office',
+      });
       showAboutDialog(context: context, children: [
-        Text('Loggedin successfully!'),
+        Text('Account created successfully!'),
       ]);
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => HomePage(),
+        builder: (context) => OfficeHomePage(),
       ));
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
@@ -54,7 +73,7 @@ class _LogInState extends State<LogIn> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(
-          'Log In',
+          'Sign Up',
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -77,6 +96,50 @@ class _LogInState extends State<LogIn> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 24),
+                TextFormField(
+                  controller: _fullNameController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Full Name',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white24,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _phoneNumberController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white24,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _officeController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Office',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white24,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
                 SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
@@ -114,6 +177,9 @@ class _LogInState extends State<LogIn> {
                     if (_formKey.currentState!.validate()) {
                       // Process data.
                       _createAccount(
+                        _fullNameController.text,
+                        _phoneNumberController.text,
+                        _officeController.text,
                         _emailController.text,
                         _passwordController.text,
                       );
@@ -128,7 +194,7 @@ class _LogInState extends State<LogIn> {
                     ),
                   ),
                   child: Text(
-                    'LOG IN',
+                    'SIGN UP',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -140,16 +206,16 @@ class _LogInState extends State<LogIn> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "New Here?",
+                      "Already have an account?",
                       style: TextStyle(color: Colors.white),
                     ),
                     TextButton(
                       onPressed: () {
                         Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (context) => SignUp()));
+                            MaterialPageRoute(builder: (context) => LogIn()));
                       },
                       child: Text(
-                        "Sign Up",
+                        "Log In",
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),

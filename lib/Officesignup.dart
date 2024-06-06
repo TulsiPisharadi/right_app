@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:right_app/Profile.dart';
 import 'package:right_app/SignUp.dart';
 import 'package:right_app/Home.dart';
+import 'package:right_app/Officehome.dart';
 
 class LogIn extends StatefulWidget {
   @override
@@ -22,27 +23,47 @@ class _LogInState extends State<LogIn> {
     super.dispose();
   }
 
-  Future<void> _createAccount(
+  Future<void> _loginAccount(
     String email,
     String password,
   ) async {
-    print('Creating account with fullName: email: $email, password: $password');
+    print('Logging in with email: $email, password: $password');
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // Retrieve the user's role from Firestore
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(credential.user!.uid)
+          .get();
+      final userRole = userDoc.data()?['role'];
+
       showAboutDialog(context: context, children: [
-        Text('Loggedin successfully!'),
+        Text('Logged in successfully!'),
       ]);
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => HomePage(),
-      ));
+
+      // Navigate to the appropriate home page based on the user's role
+      if (userRole == 'user') {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ));
+      } else if (userRole == 'office') {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => OfficeHomePage(),
+        ));
+      } else {
+        showAboutDialog(context: context, children: [
+          Text('Invalid user role!'),
+        ]);
+      }
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
       print(e.message);
       showAboutDialog(context: context, children: [
-        Text('Failed to create account!'),
+        Text('Failed to log in!'),
       ]);
     }
   }
@@ -68,7 +89,7 @@ class _LogInState extends State<LogIn> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Create New Account',
+                  'Log In',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -77,7 +98,6 @@ class _LogInState extends State<LogIn> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 24),
-                SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
                   style: TextStyle(color: Colors.white),
@@ -112,8 +132,7 @@ class _LogInState extends State<LogIn> {
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Process data.
-                      _createAccount(
+                      _loginAccount(
                         _emailController.text,
                         _passwordController.text,
                       );

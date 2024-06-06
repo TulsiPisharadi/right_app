@@ -1,8 +1,12 @@
 // ignore_for_file: prefer_const_constructors, unused_import
 
 import 'package:flutter/material.dart';
+import 'package:right_app/LogInScreen.dart';
 import 'package:right_app/Login.dart';
+import 'package:right_app/Officehome.dart';
+import 'package:right_app/Officesignup.dart';
 import 'package:right_app/SignUp.dart';
+import 'package:right_app/office_sign_up.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -66,7 +70,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       color: Colors.white),
                   _buildButton(
                       text: "Office",
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OfficeSignUp()),
+                        );
+                      },
                       width: 120,
                       height: 120,
                       color: Colors.white)
@@ -83,7 +93,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 TextButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => LogIn()));
+                        MaterialPageRoute(builder: (context) => LoginScreen()));
                   },
                   child: Text(
                     "Login",
