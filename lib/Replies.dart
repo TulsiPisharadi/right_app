@@ -2,11 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RepliesPage extends StatefulWidget {
+  String? userOffice;
+  String? userPosition;
+
+  RepliesPage({Key? key, required this.userOffice, required this.userPosition})
+      : super(key: key);
   @override
-  _RepliesPageState createState() => _RepliesPageState();
+  _RepliesPageState createState() => _RepliesPageState(
+      userOffice: this.userOffice, userPosition: this.userPosition);
 }
 
 class _RepliesPageState extends State<RepliesPage> {
+  String? userOffice;
+  String? userPosition;
+  _RepliesPageState({required this.userOffice, required this.userPosition});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +23,11 @@ class _RepliesPageState extends State<RepliesPage> {
         title: Text('Replies'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('grievances').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('grievances')
+            .where('office', isEqualTo: userOffice)
+            .where('position', isEqualTo: userPosition)
+            .snapshots(),
         builder: (context, grievancesSnapshot) {
           if (grievancesSnapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

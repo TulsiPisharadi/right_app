@@ -1,20 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:right_app/Status.dart'; // Import the cloud_firestore package
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Grievance',
-      home: GrievancePage(),
-    );
-  }
-}
+import 'package:flutter_gemini/flutter_gemini.dart';
 
 class GrievancePage extends StatefulWidget {
   @override
@@ -23,6 +12,7 @@ class GrievancePage extends StatefulWidget {
 
 class _GrievancePageState extends State<GrievancePage> {
   final TextEditingController _textController = TextEditingController();
+  final Gemini gemini = Gemini.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +88,25 @@ class _GrievancePageState extends State<GrievancePage> {
 
   void _submitGrievance() async {
     final grievanceText = _textController.text.trim();
+
+    final Map<String, List<String>> department = {
+      'Police': ['Inspector', 'Constable', 'SI'],
+      'Fireforce': ['Firefighter', 'Fire Chief', 'Fire Inspector'],
+      'Local Govt.': ['Mayor', 'Councilor', 'Administrator', 'Clerk'],
+      'PWD': ['Engineer', 'Supervisor', 'Worker'],
+      'Water Authority': ['Technician', 'Engineer', 'Manager'],
+      'KSEB': ['Technician', 'Engineer', 'Manager'],
+    };
+    String question =
+        'The user is giving the problem / instruction faced by him ; given the list of departments available $department select the most appropriate department and the proper authority to handle this issue(eg. If a technician is taking bribe, the report should be given to the higher authority; if no higher authority is found; report to police) and return the name of the department and position in the format ["Department","Position"] only.\n\n  the complaint is ${grievanceText}';
+
+    var result = await gemini.text(question);
+    String? outputText = result!.content!.parts!.first!.text;
+    print(outputText);
+    List<String> dataFromGemini =
+        json.decode(outputText!).cast<String>().toList();
+    print(dataFromGemini);
+
     if (grievanceText.isNotEmpty) {
       try {
         // Add the grievance text to Firestore
@@ -105,13 +114,16 @@ class _GrievancePageState extends State<GrievancePage> {
           'text': grievanceText,
           'timestamp': FieldValue.serverTimestamp(),
           'userId': getCurrentUserId(),
+          'office': dataFromGemini[0],
+          'position': dataFromGemini[1]
         });
         // Clear the text field after successful submission
         _textController.clear();
         // Show a success message or perform any additional actions
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Grievance submitted successfully'),
+            content: Text(
+                'Grievance submitted successfully to ${dataFromGemini[0]} ${dataFromGemini[1]}'),
           ),
         );
       } catch (e) {

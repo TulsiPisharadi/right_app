@@ -14,7 +14,6 @@ class _OfficeSignUpState extends State<OfficeSignUp> {
   final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
   final _phoneNumberController = TextEditingController();
-  final _officeController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -22,7 +21,6 @@ class _OfficeSignUpState extends State<OfficeSignUp> {
   void dispose() {
     _fullNameController.dispose();
     _phoneNumberController.dispose();
-    _officeController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -32,12 +30,13 @@ class _OfficeSignUpState extends State<OfficeSignUp> {
     String fullName,
     String phoneNumber,
     String office,
+    String position,
     String email,
     String password,
   ) async {
     try {
       print(
-          'Creating account...with email: $email and password: $password and fullName: $fullName and phoneNumber: $phoneNumber and office: $office');
+          'Creating account...with email: $email and password: $password and fullName: $fullName and phoneNumber: $phoneNumber and office: $office and position: $position');
       final credential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
@@ -48,6 +47,7 @@ class _OfficeSignUpState extends State<OfficeSignUp> {
         'fullName': fullName,
         'phoneNumber': phoneNumber,
         'office': office,
+        'position': position,
         'email': email,
         'role': 'office',
       });
@@ -65,6 +65,25 @@ class _OfficeSignUpState extends State<OfficeSignUp> {
       ]);
     }
   }
+
+  final List<String> offices = [
+    'Police',
+    'Fireforce',
+    'Local Govt.',
+    'PWD',
+    'Water Authority',
+    'KSEB'
+  ];
+  final Map<String, List<String>> positions = {
+    'Police': ['Inspector', 'Constable', 'SI'],
+    'Fireforce': ['Firefighter', 'Fire Chief', 'Fire Inspector'],
+    'Local Govt.': ['Mayor', 'Councilor', 'Administrator', 'Clerk'],
+    'PWD': ['Engineer', 'Supervisor', 'Worker'],
+    'Water Authority': ['Technician', 'Engineer', 'Manager'],
+    'KSEB': ['Technician', 'Engineer', 'Manager'],
+  };
+  String? _selectedOffice;
+  String? _selectedPosition;
 
   @override
   Widget build(BuildContext context) {
@@ -126,20 +145,68 @@ class _OfficeSignUpState extends State<OfficeSignUp> {
                   ),
                 ),
                 SizedBox(height: 16),
-                TextFormField(
-                  controller: _officeController,
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Office',
-                    labelStyle: TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.white24,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedOffice,
+                    items: offices.map((String office) {
+                      return DropdownMenuItem<String>(
+                        value: office,
+                        child: Text(office),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedOffice = newValue;
+                        _selectedPosition =
+                            null; // Reset position when office changes
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Office',
+                      labelStyle: TextStyle(color: Colors.grey),
+                      filled: true,
+                      fillColor: Colors.white24,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
+                    style: TextStyle(color: Colors.white),
+                    dropdownColor: Color.fromARGB(255, 49, 49, 49),
                   ),
                 ),
+                SizedBox(height: 16),
+                if (_selectedOffice != null)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedPosition,
+                      items: positions[_selectedOffice]!.map((String position) {
+                        return DropdownMenuItem<String>(
+                          value: position,
+                          child: Text(position),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedPosition = newValue;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Position',
+                        labelStyle: TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: Colors.white24,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: TextStyle(color: Colors.white),
+                      dropdownColor: Color.fromARGB(255, 49, 49, 49),
+                    ),
+                  ),
                 SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
@@ -179,7 +246,8 @@ class _OfficeSignUpState extends State<OfficeSignUp> {
                       _createAccount(
                         _fullNameController.text,
                         _phoneNumberController.text,
-                        _officeController.text,
+                        _selectedOffice!,
+                        _selectedPosition!,
                         _emailController.text,
                         _passwordController.text,
                       );

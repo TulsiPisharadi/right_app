@@ -6,23 +6,6 @@ import 'package:right_app/Grievance.dart';
 import 'package:right_app/Profile.dart';
 import 'package:right_app/Status.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'The Right',
-      theme: ThemeData(
-        brightness: Brightness.light, // Set the overall brightness to light
-      ),
-      home: HomePage(),
-    );
-  }
-}
-
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:right_app/AboutUs.dart';
@@ -11,6 +12,32 @@ class OfficeHomePage extends StatefulWidget {
 }
 
 class _OfficeHomePageState extends State<OfficeHomePage> {
+  var currentUser = FirebaseAuth.instance.currentUser;
+  String? userOffice;
+  String? userPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserDetails();
+  }
+
+  Future<void> _loadUserDetails() async {
+    if (currentUser != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          userOffice = userDoc['office'];
+          userPosition = userDoc['position'];
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,8 +74,13 @@ class _OfficeHomePageState extends State<OfficeHomePage> {
                   icon: Icons.reply,
                   text: 'Replies',
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => RepliesPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RepliesPage(
+                                  userOffice: userOffice,
+                                  userPosition: userPosition,
+                                )));
                     // Navigate to Replies page
                   },
                 ),
@@ -84,9 +116,13 @@ class _OfficeHomePageState extends State<OfficeHomePage> {
             SizedBox(height: 24),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('grievances')
-                    .snapshots(),
+                stream: (userOffice != null && userPosition != null)
+                    ? FirebaseFirestore.instance
+                        .collection('grievances')
+                        .where('office', isEqualTo: userOffice)
+                        .where('position', isEqualTo: userPosition)
+                        .snapshots()
+                    : null,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');

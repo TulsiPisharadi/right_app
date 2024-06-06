@@ -53,14 +53,16 @@ class _HomePageState extends State<HomePage> {
       messages = [chatMessage, ...messages];
     });
     try {
-      List<String> department = [
-        "Fireforce",
-        "Panchayath",
-        "Income taxoffice",
-        "Electricity Board"
-      ];
+      final Map<String, List<String>> department = {
+        'Police': ['Inspector', 'Constable', 'SI'],
+        'Fireforce': ['Firefighter', 'Fire Chief', 'Fire Inspector'],
+        'Local Govt.': ['Mayor', 'Councilor', 'Administrator', 'Clerk'],
+        'PWD': ['Engineer', 'Supervisor', 'Worker'],
+        'Water Authority': ['Technician', 'Engineer', 'Manager'],
+        'KSEB': ['Technician', 'Engineer', 'Manager'],
+      };
       String question =
-          'The user is giving the problem / instruction faced by him ; given the list of departments available $department select the most appropriate department to handle this issue and return the name of the department only.\n\n  the complaint is ${chatMessage.text}';
+          'The user is giving the problem / instruction faced by him ; given the list of departments available $department select the most appropriate department to handle this issue and return the name of the department and position in the format ["Department","Position"] only.\n\n  the complaint is ${chatMessage.text}';
       List<Uint8List>? images;
       if (chatMessage.medias?.isNotEmpty ?? false) {
         images = [
